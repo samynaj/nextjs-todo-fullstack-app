@@ -1,9 +1,16 @@
-import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import { Todo } from "../utils/types"
+import Link from "next/link"
 
-const Home: NextPage = () => {
+interface IndexProps {
+  todos: Array<Todo>
+}
+
+const Home = (props: IndexProps) => {
+  const { todos } = props
+
   return (
     <div className={styles.container}>
       <Head>
@@ -13,23 +20,33 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
+        <h1>My Todo List</h1>
+        <h2>Click On Todo to see it individually</h2>
+        <Link href="/todos/create" passHref><button>Create a New Todo</button></Link>
         
+        {todos.map((todo: Todo) => (
+          <div key={todo._id}>
+            <Link href={`/todos/${todo._id}`} passHref>
+              <h3 style={{ cursor: "pointer" }}>
+                {todo.title} - {todo.completed ? "completed" : "incomplete"}
+              </h3>
+            </Link>
+          </div>
+        ))}
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
     </div>
   )
+}
+
+export async function getServerSideProps() {
+  // get todo data from API
+  const res = await fetch(process.env.API_URL as string)
+  const todos = await res.json()
+
+  // return props
+  return {
+    props: { todos },
+  }
 }
 
 export default Home
