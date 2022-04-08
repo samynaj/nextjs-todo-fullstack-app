@@ -3,6 +3,8 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { Todo } from "../utils/types"
 import Link from "next/link"
+import { BsPatchCheckFill } from 'react-icons/bs'
+import { useState, useEffect } from 'react'
 
 interface IndexProps {
   todos: Array<Todo>
@@ -10,6 +12,20 @@ interface IndexProps {
 
 const Home = (props: IndexProps) => {
   const { todos } = props
+  const [list, setList] = useState(todos)
+
+  useEffect(() => {
+    setList([...todos])
+}, [todos])
+
+  const handleDateChange = (e: { target: { value: string } }) => {
+    const reset = [...todos]
+    const newList = reset.filter(item => {
+      console.log(item.date, e.target.value)
+      return item.date === e.target.value; 
+    })
+    setList(newList)
+  }
 
   return (
     <div className={styles.container}>
@@ -19,20 +35,40 @@ const Home = (props: IndexProps) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1>My Todo List</h1>
-        <h2>Click On Todo to see it individually</h2>
-        <Link href="/todos/create" passHref><button>Create a New Todo</button></Link>
-        
-        {todos.map((todo: Todo) => (
-          <div key={todo._id}>
-            <Link href={`/todos/${todo._id}`} passHref>
-              <h3 style={{ cursor: "pointer" }}>
-                {todo.title} - {todo.completed ? "completed" : "incomplete"}
-              </h3>
-            </Link>
+      <main className='container min-h-screen flex flex-col items-center ' >
+        <div className="w-full h-80 py-5 pt-py-10 px-5 flex flex-col items-center justify-center gap-5 text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+          <h1 className='text-3xl font-bold ' >Snow Todo App</h1>
+          <input type="text" className="w-full p-2 h-11 rounded-lg text-black sm:w-1/2 focus:outline-none" placeholder='Search Todos'/>
+          
+          <div className="flex w-full sm:w-1/2 justify-between">
+            <span className="flex flex-col text-black">
+              <label className='text-white' htmlFor="date">Filter by date</label>
+              <input type="date" id="date" onChange={handleDateChange}/>
+            </span>
+            <Link href="/todos/create" passHref><button className='bg-blue-500 rounded-lg p-1 font-semibold hover:scale-110' >Create New Todo</button></Link>
+          </div>  
+          <span onClick={() => setList([...todos])}>Reset</span>
+        </div>
+        <div className="w-full sm:w-1/2 h-96 relative">
+          <div className="w-full h-96 absolute -top-10 bg-white p-4 rounded-lg shadow-xl " >
+            {list.map((todo: Todo) => (
+              <div key={todo._id} className="border-b p-2">
+                <Link href={`/todos/${todo._id}`} passHref>
+                  <div className="flex items-center justify-between">
+                    <h3 >
+                      {todo.title}
+                    </h3>
+                    {
+                      todo.completed? <BsPatchCheckFill color='green' /> : ''
+                    }
+                  </div>
+                  
+                </Link>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+        
       </main>
     </div>
   )
