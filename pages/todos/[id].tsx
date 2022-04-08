@@ -1,6 +1,7 @@
 import { Todo } from "../../utils/types"
 import { useRouter } from "next/router"
 import { useState } from "react"
+import { BsPatchCheckFill } from "react-icons/bs"
 
 interface TodoItemProps {
   todo: Todo
@@ -38,18 +39,27 @@ function TodoItem(props: TodoItemProps) {
   }
 
   return (
-    <div>
-      <h1>{todo.title}</h1>
-      <h2>{todo.completed ? "completed" : "incomplete"}</h2>
-      <button onClick={handleComplete}>Complete</button>
-      <button onClick={handleDelete}>Delete</button>
-      <button
-        onClick={() => {
-          router.push("/")
-        }}
-      >
-        Go Back
-      </button>
+    <div className='container min-h-screen flex flex-col items-center gap-4'>
+        <div className="w-full h-80 py-5 pt-py-10 px-5 flex flex-col items-center justify-center gap-5 text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+            <h1 className="capitalize">{todo.title}</h1>
+            {
+                todo.completed? <BsPatchCheckFill fontSize={50} color='green' /> : ''
+            }
+            <p>{todo.body}</p>
+        </div>
+        <div className="flex items-center gap-4">
+            <button
+                onClick={() => {
+                router.push("/")
+                }}
+            >
+                Go Back
+            </button>
+            <button onClick={handleComplete} className="bg-green-500 w-36 text-white rounded-lg p-2 font-semibold hover:scale-110">Complete</button>
+            <button onClick={handleDelete} className="bg-red-500 w-36 text-white rounded-lg p-2 font-semibold hover:scale-110">Delete</button>
+            
+        </div>
+      
     </div>
   )
 }
