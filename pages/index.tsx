@@ -4,7 +4,7 @@ import styles from '../styles/Home.module.css'
 import { Todo } from "../utils/types"
 import Link from "next/link"
 import { BsPatchCheckFill } from 'react-icons/bs'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, SetStateAction } from 'react'
 
 interface IndexProps {
   todos: Array<Todo>
@@ -13,10 +13,12 @@ interface IndexProps {
 const Home = (props: IndexProps) => {
   const { todos } = props
   const [list, setList] = useState(todos)
+  const [search, setSearch] = useState('')
+  const [searchList, setSearchList] = useState([])
 
   useEffect(() => {
     setList([...todos])
-}, [todos])
+  }, [todos])
 
   const handleDateChange = (e: { target: { value: string } }) => {
     const reset = [...todos]
@@ -25,6 +27,10 @@ const Home = (props: IndexProps) => {
       return item.date === e.target.value; 
     })
     setList(newList)
+  }
+
+  const handleSearch = (e: { target: { value: SetStateAction<string> } }) => {
+    setSearch(e.target.value)
   }
 
   return (
@@ -38,7 +44,19 @@ const Home = (props: IndexProps) => {
       <main className='container min-h-screen flex flex-col items-center ' >
         <div className="w-full h-80 py-5 pt-py-10 px-5 flex flex-col items-center justify-center gap-5 text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
           <h1 className='text-3xl font-bold ' >Snow Todo App</h1>
-          <input type="text" className="w-full p-2 h-11 rounded-lg text-black sm:w-1/2 focus:outline-none" placeholder='Search Todos'/>
+          <div className="w-full sm:w-1/2 relative">
+            <input type="text" onChange={handleSearch} className="w-full p-2 h-11 rounded-lg text-black focus:outline-none" placeholder='Search Todos'/>
+            <div className={`w-full p-2 bg-white absolute z-50 ${search? 'block' : 'hidden'}`}>
+              {
+                search && list.filter(item => item.title.includes(search))
+                .map(item => (
+                  <Link key={item._id} href={`/todos/${item._id}`} passHref>
+                    <div className='border-b text-black'>{item.title}</div>
+                  </Link>
+                ))
+              }
+            </div>
+          </div>
           
           <div className="flex w-full sm:w-1/2 justify-between">
             <span className="flex flex-col text-black">
